@@ -1,14 +1,12 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
-import { Account, User as AuthUser } from "next-auth";
-import GithubProvider from "next-auth/providers/github";
-import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const NextAuth = require("next-auth").default;
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const CredentialsProvider = require("next-auth/providers/credentials").default;
 import bcrypt from "bcryptjs";
 import prisma from "@/utils/db";
 import { nanoid } from "nanoid";
 
-export const authOptions: NextAuthOptions = {
-  // Configure one or more authentication providers
+export const authOptions = {
   providers: [
     CredentialsProvider({
       id: "credentials",
@@ -20,9 +18,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials: any) {
         try {
           const user = await prisma.user.findFirst({
-            where: {
-              email: credentials.email,
-            },
+            where: { email: credentials.email },
           });
           if (user) {
             const isPasswordCorrect = await bcrypt.compare(
@@ -43,7 +39,6 @@ export const authOptions: NextAuthOptions = {
         return null;
       },
     }),
-    // Uncomment and configure these providers as needed
     // GithubProvider({
     //   clientId: process.env.GITHUB_ID!,
     //   clientSecret: process.env.GITHUB_SECRET!,
@@ -54,29 +49,22 @@ export const authOptions: NextAuthOptions = {
     // }),
   ],
   callbacks: {
-    async signIn({ user, account }: { user: AuthUser; account: Account }) {
+    async signIn({ user, account }: { user: any; account: any }) {
       if (account?.provider === "credentials") {
         return true;
       }
-      
-      // Handle OAuth providers
+
       if (account?.provider === "github" || account?.provider === "google") {
         try {
-          // Check if user exists in database
           const existingUser = await prisma.user.findFirst({
-            where: {
-              email: user.email!,
-            },
+            where: { email: user.email! },
           });
-
           if (!existingUser) {
-            // Create new user for OAuth providers
             await prisma.user.create({
               data: {
                 id: nanoid(),
                 email: user.email!,
                 role: "user",
-                // OAuth users don't have passwords
                 password: null,
               },
             });
@@ -87,51 +75,47 @@ export const authOptions: NextAuthOptions = {
           return false;
         }
       }
-      
+
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: any; user: any }) {
       if (user) {
         token.role = user.role;
         token.id = user.id;
-        token.iat = Math.floor(Date.now() / 1000); // Issued at time
+        token.iat = Math.floor(Date.now() / 1000);
       }
-      
-      // Check if token is expired (15 minutes)
+
       const now = Math.floor(Date.now() / 1000);
       const tokenAge = now - (token.iat as number);
-      const maxAge = 15 * 60; // 15 minutes
-      
-      if (tokenAge > maxAge) {
-        // Token expired, return empty object to force re-authentication
+      if (tokenAge > 15 * 60) {
         return {};
       }
-      
+
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: any; token: any }) {
       if (token) {
-        session.user.role = token.role as string;
-        session.user.id = token.id as string;
+        session.user.role = token.role;
+        session.user.id = token.id;
       }
       return session;
     },
   },
   pages: {
-    signIn: '/login',
-    error: '/login', // Redirect to login page on auth errors
+    signIn: "/login",
+    error: "/login",
   },
   session: {
-    strategy: "jwt",
-    maxAge: 15 * 60, // 15 minutes in seconds
-    updateAge: 5 * 60, // Update session every 5 minutes
+    strategy: "jwt" as const,
+    maxAge: 15 * 60,
+    updateAge: 5 * 60,
   },
   jwt: {
-    maxAge: 15 * 60, // 15 minutes in seconds
+    maxAge: 15 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
 };
 
-export const handler = NextAuth(authOptions);
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
