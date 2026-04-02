@@ -16,9 +16,12 @@ import { FaSquarePinterest } from "react-icons/fa6";
 import { sanitize } from "@/lib/sanitize";
 
 interface ImageItem {
-  imageID: string;
-  productID: string;
-  image: string;
+  id: string;
+  productId: string;
+  imageUrl: string;
+  altText?: string;
+  sortOrder?: number;
+  isPrimary?: boolean;
 }
 
 interface SingleProductPageProps {
@@ -38,6 +41,11 @@ const SingleProductPage = async ({ params }: SingleProductPageProps) => {
     `/api/images/${paramsAwaited?.id}`
   );
   const images = await imagesData.json();
+  const normalizedImages: ImageItem[] = Array.isArray(images)
+  ? images
+  : Array.isArray(images?.images)
+  ? images.images
+  : [];
 
   if (!product || product.error) {
     notFound();
@@ -56,23 +64,23 @@ const SingleProductPage = async ({ params }: SingleProductPageProps) => {
               className="w-auto h-auto"
             />
             <div className="flex justify-around mt-5 flex-wrap gap-y-1 max-[500px]:justify-center max-[500px]:gap-x-1">
-              {images?.map((imageItem: ImageItem, key: number) => (
-                <Image
-                  key={imageItem.imageID + key}
-                  src={`/${imageItem.image}`}
-                  width={100}
-                  height={100}
-                  alt="laptop image"
-                  className="w-auto h-auto"
-                />
-              ))}
-            </div>
+  {normalizedImages.map((imageItem: ImageItem, key: number) => (
+    <Image
+      key={imageItem.id || key}
+      src={`/${imageItem.imageUrl}`}
+      width={100}
+      height={100}
+      alt={imageItem.altText || product?.title || "product image"}
+      className="w-auto h-auto"
+    />
+  ))}
+</div>
           </div>
           <div className="flex flex-col gap-y-7 text-black max-[500px]:text-center">
         
             <h1 className="text-3xl">{sanitize(product?.title)}</h1>
             <p className="text-xl font-semibold">${product?.price}</p>
-            <StockAvailabillity stock={94} inStock={product?.inStock} />
+            <StockAvailabillity stock={product?.stock || 0} inStock={(product?.stock || 0) > 0} />
             <SingleProductDynamicFields product={product} />
             <div className="flex flex-col gap-y-2 max-[500px]:items-center">
              
