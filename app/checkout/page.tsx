@@ -439,7 +439,7 @@ const CheckoutPage = () => {
                     autoComplete="given-name"
                     required
                     disabled={isSubmitting}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00d08e] focus:ring-[#00d08e] sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -466,7 +466,7 @@ const CheckoutPage = () => {
                     autoComplete="family-name"
                     required
                     disabled={isSubmitting}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00d08e] focus:ring-[#00d08e] sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -493,7 +493,7 @@ const CheckoutPage = () => {
                     autoComplete="tel"
                     required
                     disabled={isSubmitting}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00d08e] focus:ring-[#00d08e] sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -520,7 +520,7 @@ const CheckoutPage = () => {
                     autoComplete="email"
                     required
                     disabled={isSubmitting}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00d08e] focus:ring-[#00d08e] sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -571,7 +571,7 @@ const CheckoutPage = () => {
                       name="company"
                       required
                       disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00d08e] focus:ring-v sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                       value={checkoutForm.company}
                       onChange={(e) =>
                         setCheckoutForm({
@@ -598,7 +598,7 @@ const CheckoutPage = () => {
                       autoComplete="street-address"
                       required
                       disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00d08e] focus:ring-[#00d08e] sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                       value={checkoutForm.adress}
                       onChange={(e) =>
                         setCheckoutForm({
@@ -624,7 +624,7 @@ const CheckoutPage = () => {
                       name="apartment"
                       required
                       disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00d08e] focus:ring-[#00d08e] sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                       value={checkoutForm.apartment}
                       onChange={(e) =>
                         setCheckoutForm({
@@ -651,7 +651,7 @@ const CheckoutPage = () => {
                       autoComplete="address-level2"
                       required
                       disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00d08e] focus:ring-[#00d08e] sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                       value={checkoutForm.city}
                       onChange={(e) =>
                         setCheckoutForm({
@@ -678,7 +678,7 @@ const CheckoutPage = () => {
                       autoComplete="address-level1"
                       required
                       disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00d08e] focus:ring-[#00d08e] sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                       value={checkoutForm.country}
                       onChange={(e) =>
                         setCheckoutForm({
@@ -705,7 +705,7 @@ const CheckoutPage = () => {
                       autoComplete="postal-code"
                       required
                       disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#00d08e] focus:ring-[#00d08e] sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                       value={checkoutForm.postalCode}
                       onChange={(e) =>
                         setCheckoutForm({
@@ -749,7 +749,7 @@ const CheckoutPage = () => {
                 type="button"
                 onClick={makePurchase}
                 disabled={isSubmitting}
-                className="w-full rounded-md border border-transparent bg-blue-500 px-20 py-2 text-lg font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full rounded-md border border-transparent bg-[#00d08e] px-20 py-2 text-lg font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Processing Order..." : "Place Order"}
               </button>

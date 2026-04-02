@@ -13,7 +13,7 @@ import React from "react";
 
 const IntroducingSection = () => {
   return (
-    <div className="py-20 pt-24 bg-gradient-to-l from-white to-blue-600">
+    <div className="py-20 pt-24 bg-gradient-to-l from-white to-[#05ffb0]">
       <div className="text-center flex flex-col gap-y-5 items-center">
         <h2 className="text-white text-8xl font-extrabold text-center mb-2 max-md:text-6xl max-[480px]:text-4xl">
           INTRODUCING <span className="text-black">SINGI</span><span className="text-blue-600">TRONIC</span>

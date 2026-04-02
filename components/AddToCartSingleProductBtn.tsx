@@ -9,13 +9,9 @@
 // *********************
 "use client";
 
-
-
 import React from "react";
 import { useProductStore } from "@/app/_zustand/store";
 import toast from "react-hot-toast";
-
-
 
 const AddToCartSingleProductBtn = ({ product, quantityCount } : SingleProductBtnProps) => {
   const { addToCart, calculateTotals } = useProductStore();
@@ -31,10 +27,11 @@ const AddToCartSingleProductBtn = ({ product, quantityCount } : SingleProductBtn
     calculateTotals();
     toast.success("Product added to the cart");
   };
+
   return (
     <button
       onClick={handleAddToCart}
-      className="btn w-[200px] text-lg border border-gray-300 border-1 font-normal bg-white text-blue-500 hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:scale-110 transition-all uppercase ease-in max-[500px]:w-full"
+      className="btn w-[200px] text-lg border border-gray-300 border-1 font-normal bg-white text-[#00d08e] hover:bg-[#05ffb0] hover:text-white hover:border-[#05ffb0] hover:scale-110 transition-all uppercase ease-in max-[500px]:w-full"
     >
       Add to cart
     </button>
