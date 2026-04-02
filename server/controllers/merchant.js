@@ -1,117 +1,221 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient, UserRole } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function getAllMerchants(request, response) {
   try {
-    const merchants = await prisma.merchant.findMany({
-      include: {
-        products: true,
+    const sellers = await prisma.user.findMany({
+      where: {
+        role: UserRole.SELLER,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        avatar: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
-    return response.json(merchants);
+
+    return response.json(sellers);
   } catch (error) {
-    console.error("Error fetching merchants:", error);
-    return response.status(500).json({ error: "Error fetching merchants" });
+    console.error("Error fetching sellers:", error);
+    return response.status(500).json({ error: "Error fetching sellers" });
   }
 }
 
 async function getMerchantById(request, response) {
   try {
     const { id } = request.params;
-    const merchant = await prisma.merchant.findUnique({
+
+    const seller = await prisma.user.findFirst({
       where: {
-        id: id,
+        id,
+        role: UserRole.SELLER,
       },
-      include: {
-        products: true,
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        avatar: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
-    if (!merchant) {
-      return response.status(404).json({ error: "Merchant not found" });
+    if (!seller) {
+      return response.status(404).json({ error: "Seller not found" });
     }
 
-    return response.json(merchant);
+    const products = await prisma.product.findMany({
+      where: {
+        sellerId: id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return response.json({
+      ...seller,
+      products,
+    });
   } catch (error) {
-    console.error("Error fetching merchant:", error);
-    return response.status(500).json({ error: "Error fetching merchant" });
+    console.error("Error fetching seller:", error);
+    return response.status(500).json({ error: "Error fetching seller" });
   }
 }
 
 async function createMerchant(request, response) {
   try {
-    const { name, email, phone, address, description, status } = request.body;
+    const {
+      name,
+      fullName,
+      email,
+      phone,
+      avatar,
+      password,
+      isActive,
+      status,
+    } = request.body;
 
-    const merchant = await prisma.merchant.create({
+    const seller = await prisma.user.create({
       data: {
-        name,
+        fullName: fullName || name,
         email,
-        phone,
-        address,
-        description,
-        status: status || "ACTIVE",
+        phone: phone || null,
+        avatar: avatar || null,
+        password: password || "seller123",
+        role: UserRole.SELLER,
+        isActive:
+          typeof isActive === "boolean"
+            ? isActive
+            : status
+            ? String(status).toLowerCase() === "active"
+            : true,
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        avatar: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
-    return response.status(201).json(merchant);
+    return response.status(201).json(seller);
   } catch (error) {
-    console.error("Error creating merchant:", error);
-    return response.status(500).json({ error: "Error creating merchant" });
+    console.error("Error creating seller:", error);
+    return response.status(500).json({ error: "Error creating seller" });
   }
 }
 
 async function updateMerchant(request, response) {
   try {
     const { id } = request.params;
-    const { name, email, phone, address, description, status } = request.body;
+    const {
+      name,
+      fullName,
+      email,
+      phone,
+      avatar,
+      isActive,
+      status,
+    } = request.body;
 
-    const merchant = await prisma.merchant.update({
+    const existingSeller = await prisma.user.findFirst({
       where: {
-        id: id,
-      },
-      data: {
-        name,
-        email,
-        phone,
-        address,
-        description,
-        status,
+        id,
+        role: UserRole.SELLER,
       },
     });
 
-    return response.json(merchant);
+    if (!existingSeller) {
+      return response.status(404).json({ error: "Seller not found" });
+    }
+
+    const seller = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        fullName: fullName || name || existingSeller.fullName,
+        email: email ?? existingSeller.email,
+        phone: phone ?? existingSeller.phone,
+        avatar: avatar ?? existingSeller.avatar,
+        isActive:
+          typeof isActive === "boolean"
+            ? isActive
+            : status
+            ? String(status).toLowerCase() === "active"
+            : existingSeller.isActive,
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        avatar: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return response.json(seller);
   } catch (error) {
-    console.error("Error updating merchant:", error);
-    return response.status(500).json({ error: "Error updating merchant" });
+    console.error("Error updating seller:", error);
+    return response.status(500).json({ error: "Error updating seller" });
   }
 }
 
 async function deleteMerchant(request, response) {
   try {
     const { id } = request.params;
-    
-    // Check if merchant has products before deletion
-    const merchant = await prisma.merchant.findUnique({
-      where: { id },
-      include: { products: true },
+
+    const existingSeller = await prisma.user.findFirst({
+      where: {
+        id,
+        role: UserRole.SELLER,
+      },
     });
 
-    if (merchant?.products.length > 0) {
+    if (!existingSeller) {
+      return response.status(404).json({ error: "Seller not found" });
+    }
+
+    const productCount = await prisma.product.count({
+      where: {
+        sellerId: id,
+      },
+    });
+
+    if (productCount > 0) {
       return response.status(400).json({
-        error: "Cannot delete merchant with existing products",
+        error: "Cannot delete seller with existing products",
       });
     }
 
-    await prisma.merchant.delete({
+    await prisma.user.delete({
       where: {
-        id: id,
+        id,
       },
     });
 
     return response.status(204).send();
   } catch (error) {
-    console.error("Error deleting merchant:", error);
-    return response.status(500).json({ error: "Error deleting merchant" });
+    console.error("Error deleting seller:", error);
+    return response.status(500).json({ error: "Error deleting seller" });
   }
 }
 
