@@ -17,20 +17,17 @@ const getAllUsers = asyncHandler(async (request, response) => {
 });
 
 const createUser = asyncHandler(async (request, response) => {
-  const { email, password, role } = request.body;
+  const { fullName, email, password, role } = request.body;
 
-  // Basic validation
-  if (!email || !password) {
-    throw new AppError("Email and password are required", 400);
+  if (!fullName || !email || !password) {
+    throw new AppError("Full name, email and password are required", 400);
   }
 
-  // Email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     throw new AppError("Invalid email format", 400);
   }
 
-  // Password validation
   if (password.length < 8) {
     throw new AppError("Password must be at least 8 characters long", 400);
   }
@@ -39,12 +36,13 @@ const createUser = asyncHandler(async (request, response) => {
 
   const user = await prisma.user.create({
     data: {
+      fullName,
       email,
       password: hashedPassword,
-      role: role || "user",
+      role: role || "CUSTOMER",
     },
   });
-  // Exclude password from response
+
   return response.status(201).json(excludePassword(user));
 });
 

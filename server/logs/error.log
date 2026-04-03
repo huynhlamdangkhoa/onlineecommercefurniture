@@ -81,3 +81,60 @@
 ::1 - - [02/Apr/2026:15:52:39 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=PHmAi8lh userId=anonymous
 ::1 - - [02/Apr/2026:15:53:16 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=7LR13I6v userId=anonymous
 ::1 - - [02/Apr/2026:15:54:09 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=4vKo1t_6 userId=anonymous
+::1 - - [03/Apr/2026:14:27:08 +0000] "POST /api/users HTTP/1.1" 500 97 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=90Q4UGqD userId=anonymous
+::1 - - [03/Apr/2026:14:27:54 +0000] "POST /api/users HTTP/1.1" 500 97 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=WpVXSUYH userId=anonymous
+::1 - - [03/Apr/2026:14:30:15 +0000] "POST /api/users HTTP/1.1" 500 97 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=8-brMqoG userId=anonymous
+::1 - - [03/Apr/2026:14:49:56 +0000] "POST /api/users HTTP/1.1" 500 97 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=8dO5r2QU userId=anonymous
+::1 - - [03/Apr/2026:14:56:18 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=TsCSDZou userId=anonymous
+::1 - - [03/Apr/2026:14:57:20 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=y8A6kkVi userId=anonymous
+::1 - - [03/Apr/2026:14:58:37 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=g8NCyTJ2 userId=anonymous
+::1 - - [03/Apr/2026:15:14:18 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=hU_PbnvO userId=anonymous
+::1 - - [03/Apr/2026:15:18:40 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=b69F6CAR userId=anonymous
+::1 - - [03/Apr/2026:15:19:20 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=95BMioVN userId=anonymous
+::1 - - [03/Apr/2026:15:19:22 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=W8Hp4GwX userId=anonymous
+::1 - - [03/Apr/2026:15:19:24 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=c9ut1Hny userId=anonymous
+::1 - - [03/Apr/2026:15:19:29 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=n307pX8G userId=anonymous
+::1 - - [03/Apr/2026:15:19:32 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=O6yNZ46b userId=anonymous
+::1 - - [03/Apr/2026:15:19:36 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=Jas_RAR- userId=anonymous
+::1 - - [03/Apr/2026:15:19:57 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=JwySHqu1 userId=anonymous
+::1 - - [03/Apr/2026:15:19:59 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=O8ydt4gn userId=anonymous
+::1 - - [03/Apr/2026:15:20:01 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=IJhdtGor userId=anonymous
+::1 - - [03/Apr/2026:15:20:03 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=4BVakU_Q userId=anonymous
+::1 - - [03/Apr/2026:15:20:05 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=Q9KlB_-9 userId=anonymous
+::1 - - [03/Apr/2026:15:29:04 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=jrooqCuJ userId=anonymous
+::1 - - [03/Apr/2026:15:29:08 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=JnOfUwGM userId=anonymous
+::1 - - [03/Apr/2026:15:29:22 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=GylDRRfy userId=anonymous
+::1 - - [03/Apr/2026:15:29:25 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=iTVF2j04 userId=anonymous
+::1 - - [03/Apr/2026:15:32:31 +0000] "POST /api/orders HTTP/1.1" 400 71 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=CovyJhdY userId=anonymous
+::1 - - [03/Apr/2026:15:32:40 +0000] "POST /api/orders HTTP/1.1" 400 71 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=B3YZaIZ2 userId=anonymous
+::1 - - [03/Apr/2026:15:32:56 +0000] "POST /api/orders HTTP/1.1" 400 71 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=q8a0eGeB userId=anonymous
+::1 - - [03/Apr/2026:15:56:22 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=45YAc_uv userId=anonymous
+::1 - - [03/Apr/2026:16:04:22 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=cB2ZRl1z userId=anonymous
+::1 - - [03/Apr/2026:16:04:37 +0000] "POST /api/orders HTTP/1.1" 400 71 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=dhiTyRwF userId=anonymous
+::1 - - [03/Apr/2026:16:04:53 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=Ou1ulRWp userId=anonymous
+::1 - - [03/Apr/2026:16:06:24 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=eYWolJON userId=anonymous
+::1 - - [03/Apr/2026:16:06:31 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=xcC3CFlo userId=anonymous
+::1 - - [03/Apr/2026:16:08:38 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=8yj1zMKa userId=anonymous
+::1 - - [03/Apr/2026:16:09:05 +0000] "POST /api/orders HTTP/1.1" 400 71 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=aUI8E_G5 userId=anonymous
+::1 - - [03/Apr/2026:16:09:30 +0000] "POST /api/orders HTTP/1.1" 400 71 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=2gsrWn9x userId=anonymous
+::1 - - [03/Apr/2026:16:23:12 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=kzj_uOOh userId=anonymous
+::1 - - [03/Apr/2026:16:23:34 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=genDu4NO userId=anonymous
+::1 - - [03/Apr/2026:16:23:39 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=GkyxBpXd userId=anonymous
+::1 - - [03/Apr/2026:16:25:15 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=yX1ciGc9 userId=anonymous
+::1 - - [03/Apr/2026:16:32:08 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=BkEB-9bG userId=anonymous
+::1 - - [03/Apr/2026:16:32:12 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=cXuf0LS9 userId=anonymous
+::1 - - [03/Apr/2026:16:42:43 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=qQEsaOo_ userId=anonymous
+::1 - - [03/Apr/2026:16:44:23 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=Iq1_JHFe userId=anonymous
+::1 - - [03/Apr/2026:16:44:30 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=os4hpBf4 userId=anonymous
+::1 - - [03/Apr/2026:16:44:30 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=BhqDoSzx userId=anonymous
+::1 - - [03/Apr/2026:16:44:38 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=MDjH47pq userId=anonymous
+::1 - - [03/Apr/2026:16:44:45 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=N5VzyP0j userId=anonymous
+::1 - - [03/Apr/2026:16:44:48 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=8vrKn2O- userId=anonymous
+::1 - - [03/Apr/2026:16:44:49 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=B58nzm79 userId=anonymous
+::1 - - [03/Apr/2026:16:44:55 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=KJ-MC1N4 userId=anonymous
+::1 - - [03/Apr/2026:16:45:07 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=PSmnHpbv userId=anonymous
+::1 - - [03/Apr/2026:16:45:14 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=gKV--lJe userId=anonymous
+::1 - - [03/Apr/2026:16:53:25 +0000] "GET /api/images/undefined HTTP/1.1" 404 29 "-" "node" reqId=QDCLi5zQ userId=anonymous
+::1 - - [03/Apr/2026:16:53:26 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" reqId=geh8Yb7q userId=anonymous
+::1 - - [03/Apr/2026:16:57:46 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15 Edg/146.0.0.0" reqId=vyEEE8Gf userId=anonymous
+::1 - - [03/Apr/2026:16:58:09 +0000] "GET /api/wishlist/56ab91f8-e891-416a-ad8b-e197809fe6df HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15 Edg/146.0.0.0" reqId=j_OEQnm2 userId=anonymous

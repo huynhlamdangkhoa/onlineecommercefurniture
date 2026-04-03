@@ -47,7 +47,9 @@ function normalizeItems(items) {
     }));
 }
 
-function buildShippingFields(body) {
+function buildShippingFields(body, options = {}) {
+  const { defaultCountry = null } = options;
+
   return {
     shippingRecipientName:
       body.shippingRecipientName ||
@@ -56,11 +58,14 @@ function buildShippingFields(body) {
       null,
     shippingPhone: body.shippingPhone || body.phone || null,
     shippingLine1: body.shippingLine1 || body.adress || body.address || null,
+    shippingLine2: body.shippingLine2 || body.apartment || body.line2 || null,
     shippingWard: body.shippingWard || body.ward || null,
     shippingDistrict: body.shippingDistrict || body.district || null,
     shippingCity: body.shippingCity || body.city || null,
     shippingProvince: body.shippingProvince || body.province || null,
-    shippingCountry: body.shippingCountry || body.country || "Vietnam",
+    shippingCountry:
+      body.shippingCountry || body.country || defaultCountry,
+    shippingPostalCode: body.shippingPostalCode || body.postalCode || null,
   };
 }
 
@@ -73,13 +78,6 @@ async function createCustomerOrder(request, response) {
       return response.status(400).json({
         error: "Validation failed",
         details: "userId is required",
-      });
-    }
-
-    if (!body.shippingAddressId) {
-      return response.status(400).json({
-        error: "Validation failed",
-        details: "shippingAddressId is required",
       });
     }
 
@@ -101,14 +99,17 @@ async function createCustomerOrder(request, response) {
       });
     }
 
-    const shippingAddress = await prisma.address.findUnique({
-      where: { id: body.shippingAddressId },
-    });
+   const shippingFields = buildShippingFields(body, { defaultCountry: "Vietnam" });
 
-    if (!shippingAddress) {
-      return response.status(404).json({
-        error: "Address not found",
-        details: "The specified shipping address does not exist",
+    if (
+      !shippingFields.shippingRecipientName ||
+      !shippingFields.shippingPhone ||
+      !shippingFields.shippingLine1 ||
+      !shippingFields.shippingCity
+    ) {
+      return response.status(400).json({
+        error: "Validation failed",
+        details: "Missing required shipping information",
       });
     }
 
@@ -142,16 +143,50 @@ async function createCustomerOrder(request, response) {
       if (item.subtotal === "0") {
         item.subtotal = String(Number(item.unitPrice) * item.quantity);
       }
+
+      if (!item.conditionAtOrder) {
+        item.conditionAtOrder = product.condition;
+      }
     }
 
-    const shippingFields = buildShippingFields(body);
-
     const createdOrder = await prisma.$transaction(async (tx) => {
+      let shippingAddressId = body.shippingAddressId || null;
+
+      if (shippingAddressId) {
+        const existingAddress = await tx.address.findUnique({
+          where: { id: shippingAddressId },
+        });
+
+        if (!existingAddress) {
+          throw new Error("SHIPPING_ADDRESS_NOT_FOUND");
+        }
+      } else {
+        const createdAddress = await tx.address.create({
+          data: {
+            userId: body.userId,
+            label: body.addressLabel || "Shipping address",
+            recipientName: shippingFields.shippingRecipientName,
+            phone: shippingFields.shippingPhone,
+            line1: shippingFields.shippingLine1,
+            line2: shippingFields.shippingLine2,
+            ward: shippingFields.shippingWard,
+            district: shippingFields.shippingDistrict,
+            city: shippingFields.shippingCity,
+            province: shippingFields.shippingProvince,
+            country: shippingFields.shippingCountry,
+            postalCode: shippingFields.shippingPostalCode,
+            isDefault: false,
+          },
+        });
+
+        shippingAddressId = createdAddress.id;
+      }
+
       const order = await tx.order.create({
         data: {
           orderNumber: body.orderNumber || buildOrderNumber(),
           userId: body.userId,
-          shippingAddressId: body.shippingAddressId,
+          shippingAddressId,
           status: normalizeEnum(body.status, OrderStatus, OrderStatus.PENDING),
           paymentMethod: normalizeEnum(
             body.paymentMethod,
@@ -173,7 +208,9 @@ async function createCustomerOrder(request, response) {
           discount: toDecimalString(body.discount, "0"),
           total: toDecimalString(body.total, "0"),
           note: body.note || body.orderNotice || null,
+
           ...shippingFields,
+
           items: {
             create: items.map((item) => ({
               productId: item.productId,
@@ -184,6 +221,7 @@ async function createCustomerOrder(request, response) {
               conditionAtOrder: item.conditionAtOrder,
             })),
           },
+
           payment: body.payment
             ? {
                 create: {
@@ -202,7 +240,9 @@ async function createCustomerOrder(request, response) {
                     body.payment.amount || body.total,
                     "0"
                   ),
-                  paidAt: body.payment.paidAt ? new Date(body.payment.paidAt) : null,
+                  paidAt: body.payment.paidAt
+                    ? new Date(body.payment.paidAt)
+                    : null,
                 },
               }
             : undefined,
@@ -244,6 +284,13 @@ async function createCustomerOrder(request, response) {
       message: "Order created successfully",
     });
   } catch (error) {
+    if (error.message === "SHIPPING_ADDRESS_NOT_FOUND") {
+      return response.status(404).json({
+        error: "Address not found",
+        details: "The specified shipping address does not exist",
+      });
+    }
+
     console.error("Error creating order:", error);
     return response.status(500).json({
       error: "Internal server error",
@@ -333,17 +380,23 @@ async function updateCustomerOrder(request, response) {
               ? body.orderNotice
               : existingOrder.note,
           shippingRecipientName:
-            shippingFields.shippingRecipientName ?? existingOrder.shippingRecipientName,
-          shippingPhone: shippingFields.shippingPhone ?? existingOrder.shippingPhone,
-          shippingLine1: shippingFields.shippingLine1 ?? existingOrder.shippingLine1,
-          shippingWard: shippingFields.shippingWard ?? existingOrder.shippingWard,
-          shippingDistrict:
-            shippingFields.shippingDistrict ?? existingOrder.shippingDistrict,
-          shippingCity: shippingFields.shippingCity ?? existingOrder.shippingCity,
-          shippingProvince:
-            shippingFields.shippingProvince ?? existingOrder.shippingProvince,
-          shippingCountry:
-            shippingFields.shippingCountry ?? existingOrder.shippingCountry,
+  shippingFields.shippingRecipientName ?? existingOrder.shippingRecipientName,
+shippingPhone: shippingFields.shippingPhone ?? existingOrder.shippingPhone,
+shippingLine1: shippingFields.shippingLine1 ?? existingOrder.shippingLine1,
+
+shippingLine2: shippingFields.shippingLine2 ?? existingOrder.shippingLine2,
+
+shippingWard: shippingFields.shippingWard ?? existingOrder.shippingWard,
+shippingDistrict:
+  shippingFields.shippingDistrict ?? existingOrder.shippingDistrict,
+shippingCity: shippingFields.shippingCity ?? existingOrder.shippingCity,
+shippingProvince:
+  shippingFields.shippingProvince ?? existingOrder.shippingProvince,
+shippingCountry:
+  shippingFields.shippingCountry ?? existingOrder.shippingCountry,
+
+shippingPostalCode:
+  shippingFields.shippingPostalCode ?? existingOrder.shippingPostalCode,
         },
         include: {
           items: true,

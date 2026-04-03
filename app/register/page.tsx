@@ -24,70 +24,63 @@ const RegisterPage = () => {
   };
   
   const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    const email = e.target[2].value;
-    const password = e.target[3].value;
-    const confirmPassword = e.target[4].value;
+  e.preventDefault();
 
-    if (!isValidEmail(email)) {
-      setError("Email is invalid");
-      toast.error("Email is invalid");
-      return;
+  const name = e.target.name.value.trim();
+  const lastname = e.target.lastname.value.trim();
+  const email = e.target.email.value.trim();
+  const password = e.target.password.value;
+  const confirmPassword = e.target.confirmpassword.value;
+  const fullName = `${name} ${lastname}`.trim();
+
+  if (!isValidEmail(email)) {
+    setError("Email is invalid");
+    toast.error("Email is invalid");
+    return;
+  }
+
+  if (!password || password.length < 8) {
+    setError("Password must be 8 characters long");
+    toast.error("Password must be 8 characters long");
+    return;
+  }
+
+  if (confirmPassword !== password) {
+    setError("Passwords are not equal");
+    toast.error("Passwords are not equal");
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:3001/api/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        fullName,
+        email,
+        password,
+        role: "CUSTOMER",
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setError("");
+      toast.success("Registration successful");
+      router.push("/login");
+    } else {
+      setError(data.error || "Registration failed");
+      toast.error(data.error || "Registration failed");
     }
-
-    if (!password || password.length < 8) {
-      setError("Password must be 8 characters long");
-      toast.error("Password must be 8 characters long");
-      return;
-    }
-
-    if (confirmPassword !== password) {
-      setError("Passwords are not equal");
-      toast.error("Passwords are not equal");
-      return;
-    }
-
-    try {
-      // sending API request for registering user
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setError("");
-        toast.success("Registration successful");
-        router.push("/login");
-      } else {
-        // Handle different types of errors
-        if (data.details && Array.isArray(data.details)) {
-          // Validation errors
-          const errorMessage = data.details.map((err: any) => err.message).join(", ");
-          setError(errorMessage);
-          toast.error(errorMessage);
-        } else if (data.error) {
-          // General errors
-          setError(data.error);
-          toast.error(data.error);
-        } else {
-          setError("Registration failed");
-          toast.error("Registration failed");
-        }
-      }
-    } catch (error) {
-      toast.error("Error, try again");
-      setError("Error, try again");
-      console.log(error);
-    }
-  };
+  } catch (error) {
+    toast.error("Error, try again");
+    setError("Error, try again");
+    console.log(error);
+  }
+};
 
   if (sessionStatus === "loading") {
     return <h1>Loading...</h1>;
