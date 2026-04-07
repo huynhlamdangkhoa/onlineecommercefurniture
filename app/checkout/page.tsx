@@ -246,7 +246,7 @@ clearCart();
       );
 
       setTimeout(() => {
-        router.push("/");
+       router.push(`/order/${data.id}`);
       }, 1000);
     } catch (error) {
       console.error("💥 Error in makePurchase:", error);
