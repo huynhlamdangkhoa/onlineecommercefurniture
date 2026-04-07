@@ -169,7 +169,7 @@ const CheckoutPage = () => {
 
         userId,
         status: "PENDING",
-        paymentMethod: "COD",
+        paymentMethod: "BANK_TRANSFER",
         deliveryMethod: "DELIVERY",
         paymentStatus: "PENDING",
 

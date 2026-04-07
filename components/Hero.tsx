@@ -17,13 +17,10 @@ const Hero = () => {
       <div className="grid grid-cols-3 items-center justify-items-center px-10 gap-x-10 max-w-screen-2xl mx-auto h-full max-lg:grid-cols-1 max-lg:py-10 max-lg:gap-y-10">
         <div className="flex flex-col gap-y-5 max-lg:order-last col-span-2">
           <h1 className="text-6xl text-white font-bold mb-3 max-xl:text-5xl max-md:text-4xl max-sm:text-3xl">
-            THE PRODUCT OF THE FUTURE
+            QUALITY USED FURNITURE FOR MODERN LIVING
           </h1>
           <p className="text-white max-sm:text-sm">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolor modi
-            iure laudantium necessitatibus ab, voluptates vitae ullam. Officia
-            ipsam iusto beatae nesciunt, consequatur deserunt minima maiores
-            earum obcaecati. Optio, nam!
+            Discover affordable and stylish pre-owned furniture for your living room, bedroom, dining room, and office. Give furniture a second life with comfort and value.
           </p>
           <div className="flex gap-x-1 max-lg:flex-col max-lg:gap-y-1">
             <button className="bg-white text-[#00d08e] font-bold px-12 py-3 max-lg:text-xl max-sm:text-lg hover:bg-gray-100">
@@ -35,12 +32,12 @@ const Hero = () => {
           </div>
         </div>
         <Image
-          src="/watch for banner.png"
-          width={400}
-          height={400}
-          alt="smart watch"
-          className="max-md:w-[300px] max-md:h-[300px] max-sm:h-[250px] max-sm:w-[250px] w-auto h-auto"
-        />
+  src="/herofurniture.png"
+  width={650}
+  height={520}
+  alt="used furniture showroom"
+  className="w-full max-w-[650px] h-[420px] lg:h-[520px] object-cover rounded-xl shadow-lg max-md:h-[320px]"
+/>
       </div>
     </div>
   );
