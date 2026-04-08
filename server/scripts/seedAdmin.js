@@ -1,32 +1,31 @@
-//Script tạo tài khoản admin
-//Chạy node server/scripts/seedAdmin.js
+// Script tạo tài khoản admin
+// Chạy: node server/scripts/seedAdmin.js
 
-
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient, UserRole } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
-const { nanoid } = require('nanoid');
 
 const prisma = new PrismaClient();
 
 async function seedAdmin() {
-  const email = 'admin@gmail.com'; //mail đăng nhập
-  const password = 'Admin12345?'; //mật khẩu
-  const role = 'admin';
+  const email = 'admin@gmail.com';
+  const password = 'Admin12345?';
+  const role = UserRole.ADMIN;
 
   try {
-    // Kiểm tra đã tồn tại chưa
-    const existing = await prisma.user.findFirst({ where: { email } });
+    // Check tồn tại
+    const existing = await prisma.user.findUnique({
+      where: { email },
+    });
 
     if (existing) {
-      // Nếu tồn tại nhưng chưa phải admin thì update
       if (existing.role !== role) {
         await prisma.user.update({
           where: { email },
           data: { role },
         });
-        console.log(`    Updated existing user "${email}" to role: admin`);
+        console.log(` Updated "${email}" to ADMIN`);
       } else {
-        console.log(`ℹ   Admin "${email}" already exists. Skipping.`);
+        console.log(`ℹ Admin "${email}" already exists`);
       }
       return;
     }
@@ -35,17 +34,17 @@ async function seedAdmin() {
 
     await prisma.user.create({
       data: {
-        id: nanoid(),
         email,
         password: hashedPassword,
-        role,
+        fullName: 'System Admin', 
+        role,                     
+
       },
     });
 
-    console.log('   Admin account created successfully!');
-    console.log(`   Email   : ${email}`);
-    console.log(`   Password: ${password}`);
-    console.log(`   Role    : ${role}`);
+    console.log('🔥 Admin created successfully!');
+    console.log(`Email   : ${email}`);
+    console.log(`Password: ${password}`);
   } catch (err) {
     console.error('❌ Error creating admin:', err);
   } finally {
