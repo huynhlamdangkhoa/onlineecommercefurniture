@@ -37,6 +37,7 @@ const DashboardNewCategoryPage = () => {
       toast.error("You need to enter values to add a category");
     }
   };
+
   return (
     <div className="bg-white flex justify-start max-w-screen-2xl mx-auto xl:h-full max-xl:flex-col max-xl:gap-y-5">
       <DashboardSidebar />
@@ -61,7 +62,7 @@ const DashboardNewCategoryPage = () => {
         <div className="flex gap-x-2">
           <button
             type="button"
-            className="uppercase bg-blue-500 px-10 py-5 text-lg border border-black border-gray-300 font-bold text-white shadow-sm hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2"
+            className="uppercase bg-[#00d08e] px-10 py-5 text-lg border border-gray-300 font-bold text-white shadow-sm hover:bg-[#00b87d] focus:outline-none focus:ring-2 focus:ring-[#00d08e]"
             onClick={addNewCategory}
           >
             Create category

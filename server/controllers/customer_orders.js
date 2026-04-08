@@ -1,169 +1,300 @@
-const { PrismaClient } = require("@prisma/client");
+const {
+  PrismaClient,
+  OrderStatus,
+  PaymentMethod,
+  PaymentStatus,
+  DeliveryMethod,
+} = require("@prisma/client");
+
 const prisma = new PrismaClient();
-const { validateOrderData, ValidationError } = require('../utills/validation');
-const { createOrderUpdateNotification } = require('../utills/notificationHelpers');
+const { createOrderUpdateNotification } = require("../utills/notificationHelpers");
+
+function toDecimalString(value, fallback = "0") {
+  if (value === undefined || value === null || value === "") return fallback;
+  const num = Number(value);
+  if (Number.isNaN(num)) return fallback;
+  return String(num);
+}
+
+function normalizeEnum(value, enumObject, fallback) {
+  if (!value) return fallback;
+  return Object.values(enumObject).includes(value) ? value : fallback;
+}
+
+function buildOrderNumber() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  const h = String(now.getHours()).padStart(2, "0");
+  const min = String(now.getMinutes()).padStart(2, "0");
+  const s = String(now.getSeconds()).padStart(2, "0");
+  return `UF-${y}${m}${d}-${h}${min}${s}`;
+}
+
+function normalizeItems(items) {
+  if (!Array.isArray(items)) return [];
+
+  return items
+    .filter((item) => item && item.productId)
+    .map((item) => ({
+      productId: item.productId,
+      quantity: Number(item.quantity) > 0 ? Number(item.quantity) : 1,
+      productTitle: item.productTitle || item.title || "",
+      unitPrice: toDecimalString(item.unitPrice || item.price, "0"),
+      subtotal: toDecimalString(item.subtotal, "0"),
+      conditionAtOrder: item.conditionAtOrder || null,
+    }));
+}
+
+function buildShippingFields(body, options = {}) {
+  const { defaultCountry = null } = options;
+
+  return {
+    shippingRecipientName:
+      body.shippingRecipientName ||
+      body.recipientName ||
+      [body.name, body.lastname].filter(Boolean).join(" ").trim() ||
+      null,
+    shippingPhone: body.shippingPhone || body.phone || null,
+    shippingLine1: body.shippingLine1 || body.adress || body.address || null,
+    shippingLine2: body.shippingLine2 || body.apartment || body.line2 || null,
+    shippingWard: body.shippingWard || body.ward || null,
+    shippingDistrict: body.shippingDistrict || body.district || null,
+    shippingCity: body.shippingCity || body.city || null,
+    shippingProvince: body.shippingProvince || body.province || null,
+    shippingCountry:
+      body.shippingCountry || body.country || defaultCountry,
+    shippingPostalCode: body.shippingPostalCode || body.postalCode || null,
+  };
+}
 
 async function createCustomerOrder(request, response) {
   try {
-    console.log("=== ORDER CREATION REQUEST ===");
-    console.log("Request body:", JSON.stringify(request.body, null, 2));
-    
-    // Validate request body
-    if (!request.body || typeof request.body !== 'object') {
-      console.log("❌ Invalid request body");
-      return response.status(400).json({ 
-        error: "Invalid request body",
-        details: "Request body must be a valid JSON object"
-      });
-    }
+    const body = request.body || {};
+    const items = normalizeItems(body.items);
 
-    // Server-side validation
-    const validation = validateOrderData(request.body);
-    console.log("Validation result:", validation);
-    
-    if (!validation.isValid) {
-      console.log("❌ Validation failed:", validation.errors);
+    if (!body.userId) {
       return response.status(400).json({
         error: "Validation failed",
-        details: validation.errors
+        details: "userId is required",
       });
     }
 
-    const validatedData = validation.validatedData;
-    console.log("✅ Validation passed, validated data:", validatedData);
-
-    // Additional business logic validation
-    if (validatedData.total < 0.01) {
-      console.log("❌ Invalid total amount");
+    if (items.length === 0) {
       return response.status(400).json({
-        error: "Invalid order total",
-        details: [{ field: 'total', message: 'Order total must be at least $0.01' }]
+        error: "Validation failed",
+        details: "At least one order item is required",
       });
     }
 
-    // Check for duplicate orders (same email and total within last 1 minute) - less strict
-    const oneMinuteAgo = new Date(Date.now() - 1 * 60 * 1000);
-    const duplicateOrder = await prisma.customer_order.findFirst({
-      where: {
-        email: validatedData.email,
-        total: validatedData.total,
-        dateTime: {
-          gte: oneMinuteAgo
-        }
-      }
+    const user = await prisma.user.findUnique({
+      where: { id: body.userId },
     });
 
-    if (duplicateOrder) {
-      console.log("❌ Duplicate order detected (same email, amount, within 1 minute)");
-      return response.status(409).json({
-        error: "Duplicate order detected",
-        details: "An identical order was just created. Please wait a moment before creating another order with the same details."
+    if (!user) {
+      return response.status(404).json({
+        error: "User not found",
+        details: "The specified user does not exist",
       });
     }
 
-    console.log("Creating order in database...");
-    // Create the order with validated data
-    const corder = await prisma.customer_order.create({
-      data: {
-        name: validatedData.name,
-        lastname: validatedData.lastname,
-        phone: validatedData.phone,
-        email: validatedData.email,
-        company: validatedData.company,
-        adress: validatedData.adress,
-        apartment: validatedData.apartment,
-        postalCode: validatedData.postalCode,
-        status: validatedData.status,
-        city: validatedData.city,
-        country: validatedData.country,
-        orderNotice: validatedData.orderNotice,
-        total: validatedData.total,
-        dateTime: new Date()
-      },
-    });
+   const shippingFields = buildShippingFields(body, { defaultCountry: "Vietnam" });
 
-    console.log("✅ Order created successfully:", corder);
-    console.log("Order ID:", corder.id);
+    if (
+      !shippingFields.shippingRecipientName ||
+      !shippingFields.shippingPhone ||
+      !shippingFields.shippingLine1 ||
+      !shippingFields.shippingCity
+    ) {
+      return response.status(400).json({
+        error: "Validation failed",
+        details: "Missing required shipping information",
+      });
+    }
 
-    // Create notification for the user if they have an account
-    try {
-      let user = null;
-      
-      // First, try to use userId if provided (from logged-in user)
-      if (request.body.userId) {
-        console.log(`🔍 Using provided userId: ${request.body.userId}`);
-        user = await prisma.user.findUnique({
-          where: { id: request.body.userId }
+    for (const item of items) {
+      const product = await prisma.product.findUnique({
+        where: { id: item.productId },
+      });
+
+      if (!product) {
+        return response.status(404).json({
+          error: "Product not found",
+          details: `Product ${item.productId} does not exist`,
         });
-        if (user) {
-          console.log(`✅ Found user by ID: ${user.email}`);
-        } else {
-          console.log(`❌ User not found with ID: ${request.body.userId}`);
-        }
       }
-      
-      // Fallback: search by email if no userId or user not found
-      if (!user) {
-        console.log(`🔍 Searching user by email: ${validatedData.email}`);
-        user = await prisma.user.findUnique({
-          where: { email: validatedData.email }
+
+      if (product.stock < item.quantity) {
+        return response.status(400).json({
+          error: "Insufficient stock",
+          details: `Product ${product.title} does not have enough stock`,
         });
-        if (user) {
-          console.log(`✅ Found user by email: ${user.email}`);
-        }
       }
-      
-      if (user) {
-        await createOrderUpdateNotification(
-          user.id,
-          'confirmed',
-          corder.id,
-          validatedData.total
-        );
-        console.log(`📧 Order confirmation notification sent to user: ${user.email}`);
+
+      if (!item.productTitle) {
+        item.productTitle = product.title;
+      }
+
+      if (item.unitPrice === "0") {
+        item.unitPrice = String(product.price);
+      }
+
+      if (item.subtotal === "0") {
+        item.subtotal = String(Number(item.unitPrice) * item.quantity);
+      }
+
+      if (!item.conditionAtOrder) {
+        item.conditionAtOrder = product.condition;
+      }
+    }
+
+    const createdOrder = await prisma.$transaction(async (tx) => {
+      let shippingAddressId = body.shippingAddressId || null;
+
+      if (shippingAddressId) {
+        const existingAddress = await tx.address.findUnique({
+          where: { id: shippingAddressId },
+        });
+
+        if (!existingAddress) {
+          throw new Error("SHIPPING_ADDRESS_NOT_FOUND");
+        }
       } else {
-        console.log(`ℹ️  No user account found for email: ${validatedData.email} - notification skipped`);
+        const createdAddress = await tx.address.create({
+          data: {
+            userId: body.userId,
+            label: body.addressLabel || "Shipping address",
+            recipientName: shippingFields.shippingRecipientName,
+            phone: shippingFields.shippingPhone,
+            line1: shippingFields.shippingLine1,
+            line2: shippingFields.shippingLine2,
+            ward: shippingFields.shippingWard,
+            district: shippingFields.shippingDistrict,
+            city: shippingFields.shippingCity,
+            province: shippingFields.shippingProvince,
+            country: shippingFields.shippingCountry,
+            postalCode: shippingFields.shippingPostalCode,
+            isDefault: false,
+          },
+        });
+
+        shippingAddressId = createdAddress.id;
       }
+
+      const order = await tx.order.create({
+        data: {
+          orderNumber: body.orderNumber || buildOrderNumber(),
+          userId: body.userId,
+          shippingAddressId,
+          status: normalizeEnum(body.status, OrderStatus, OrderStatus.PENDING),
+          paymentMethod: normalizeEnum(
+            body.paymentMethod,
+            PaymentMethod,
+            PaymentMethod.COD
+          ),
+          deliveryMethod: normalizeEnum(
+            body.deliveryMethod,
+            DeliveryMethod,
+            DeliveryMethod.DELIVERY
+          ),
+          paymentStatus: normalizeEnum(
+            body.paymentStatus,
+            PaymentStatus,
+            PaymentStatus.PENDING
+          ),
+          subtotal: toDecimalString(body.subtotal, "0"),
+          shippingFee: toDecimalString(body.shippingFee, "0"),
+          discount: toDecimalString(body.discount, "0"),
+          total: toDecimalString(body.total, "0"),
+          note: body.note || body.orderNotice || null,
+
+          ...shippingFields,
+
+          items: {
+            create: items.map((item) => ({
+              productId: item.productId,
+              productTitle: item.productTitle,
+              unitPrice: item.unitPrice,
+              quantity: item.quantity,
+              subtotal: item.subtotal,
+              conditionAtOrder: item.conditionAtOrder,
+            })),
+          },
+
+          payment: body.payment
+            ? {
+                create: {
+                  method: normalizeEnum(
+                    body.payment.method || body.paymentMethod,
+                    PaymentMethod,
+                    PaymentMethod.COD
+                  ),
+                  status: normalizeEnum(
+                    body.payment.status || body.paymentStatus,
+                    PaymentStatus,
+                    PaymentStatus.PENDING
+                  ),
+                  transactionId: body.payment.transactionId || null,
+                  amount: toDecimalString(
+                    body.payment.amount || body.total,
+                    "0"
+                  ),
+                  paidAt: body.payment.paidAt
+                    ? new Date(body.payment.paidAt)
+                    : null,
+                },
+              }
+            : undefined,
+        },
+        include: {
+          items: true,
+          payment: true,
+        },
+      });
+
+      for (const item of items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: {
+              decrement: item.quantity,
+            },
+          },
+        });
+      }
+
+      return order;
+    });
+
+    try {
+      await createOrderUpdateNotification(
+        body.userId,
+        createdOrder.status,
+        createdOrder.id,
+        createdOrder.total
+      );
     } catch (notificationError) {
-      console.error('❌ Failed to create order notification:', notificationError);
-      // Don't fail the order if notification fails
+      console.error("Failed to create order notification:", notificationError);
     }
 
-    // Log successful order creation (for monitoring)
-    console.log(`Order created successfully: ID ${corder.id}, Email: ${validatedData.email}, Total: $${validatedData.total}`);
-
-    const responseData = {
-      id: corder.id,
+    return response.status(201).json({
+      id: createdOrder.id,
+      orderNumber: createdOrder.orderNumber,
       message: "Order created successfully",
-      orderNumber: corder.id
-    };
-    
-    console.log("Sending response:", responseData);
-    return response.status(201).json(responseData);
-
+    });
   } catch (error) {
-    console.error("❌ Error creating order:", error);
-    
-    // Handle specific Prisma errors
-    if (error.code === 'P2002') {
-      return response.status(409).json({ 
-        error: "Order conflict",
-        details: "An order with this information already exists"
+    if (error.message === "SHIPPING_ADDRESS_NOT_FOUND") {
+      return response.status(404).json({
+        error: "Address not found",
+        details: "The specified shipping address does not exist",
       });
     }
 
-    // Handle validation errors
-    if (error instanceof ValidationError) {
-      return response.status(400).json({
-        error: "Validation failed",
-        details: [{ field: error.field, message: error.message }]
-      });
-    }
-
-    // Generic error response
-    return response.status(500).json({ 
+    console.error("Error creating order:", error);
+    return response.status(500).json({
       error: "Internal server error",
-      details: "Failed to create order. Please try again later."
+      details: "Failed to create order",
     });
   }
 }
@@ -171,113 +302,162 @@ async function createCustomerOrder(request, response) {
 async function updateCustomerOrder(request, response) {
   try {
     const { id } = request.params;
-    
-    // Validate ID format
-    if (!id || typeof id !== 'string') {
+    const body = request.body || {};
+
+    if (!id) {
       return response.status(400).json({
         error: "Invalid order ID",
-        details: "Order ID must be provided"
+        details: "Order ID must be provided",
       });
     }
 
-    // Validate request body
-    if (!request.body || typeof request.body !== 'object') {
-      return response.status(400).json({ 
-        error: "Invalid request body",
-        details: "Request body must be a valid JSON object"
-      });
-    }
-
-    // Server-side validation for update data
-    const validation = validateOrderData(request.body);
-    
-    if (!validation.isValid) {
-      return response.status(400).json({
-        error: "Validation failed",
-        details: validation.errors
-      });
-    }
-
-    const validatedData = validation.validatedData;
-
-    const existingOrder = await prisma.customer_order.findUnique({
-      where: {
-        id: id,
-      },
+    const existingOrder = await prisma.order.findUnique({
+      where: { id },
+      include: { payment: true },
     });
 
     if (!existingOrder) {
-      return response.status(404).json({ 
+      return response.status(404).json({
         error: "Order not found",
-        details: "The specified order does not exist"
+        details: "The specified order does not exist",
       });
     }
 
-    const updatedOrder = await prisma.customer_order.update({
-      where: {
-        id: existingOrder.id,
-      },
-      data: {
-        name: validatedData.name,
-        lastname: validatedData.lastname,
-        phone: validatedData.phone,
-        email: validatedData.email,
-        company: validatedData.company,
-        adress: validatedData.adress,
-        apartment: validatedData.apartment,
-        postalCode: validatedData.postalCode,
-        status: validatedData.status,
-        city: validatedData.city,
-        country: validatedData.country,
-        orderNotice: validatedData.orderNotice,
-        total: validatedData.total,
-      },
+    const shippingFields = buildShippingFields(body);
+
+    const updatedOrder = await prisma.$transaction(async (tx) => {
+      const order = await tx.order.update({
+        where: { id },
+        data: {
+          status:
+            body.status !== undefined
+              ? normalizeEnum(body.status, OrderStatus, existingOrder.status)
+              : existingOrder.status,
+          paymentMethod:
+            body.paymentMethod !== undefined
+              ? normalizeEnum(
+                  body.paymentMethod,
+                  PaymentMethod,
+                  existingOrder.paymentMethod
+                )
+              : existingOrder.paymentMethod,
+          deliveryMethod:
+            body.deliveryMethod !== undefined
+              ? normalizeEnum(
+                  body.deliveryMethod,
+                  DeliveryMethod,
+                  existingOrder.deliveryMethod
+                )
+              : existingOrder.deliveryMethod,
+          paymentStatus:
+            body.paymentStatus !== undefined
+              ? normalizeEnum(
+                  body.paymentStatus,
+                  PaymentStatus,
+                  existingOrder.paymentStatus
+                )
+              : existingOrder.paymentStatus,
+          subtotal:
+            body.subtotal !== undefined
+              ? toDecimalString(body.subtotal, "0")
+              : existingOrder.subtotal,
+          shippingFee:
+            body.shippingFee !== undefined
+              ? toDecimalString(body.shippingFee, "0")
+              : existingOrder.shippingFee,
+          discount:
+            body.discount !== undefined
+              ? toDecimalString(body.discount, "0")
+              : existingOrder.discount,
+          total:
+            body.total !== undefined
+              ? toDecimalString(body.total, "0")
+              : existingOrder.total,
+          note:
+            body.note !== undefined
+              ? body.note
+              : body.orderNotice !== undefined
+              ? body.orderNotice
+              : existingOrder.note,
+          shippingRecipientName:
+  shippingFields.shippingRecipientName ?? existingOrder.shippingRecipientName,
+shippingPhone: shippingFields.shippingPhone ?? existingOrder.shippingPhone,
+shippingLine1: shippingFields.shippingLine1 ?? existingOrder.shippingLine1,
+
+shippingLine2: shippingFields.shippingLine2 ?? existingOrder.shippingLine2,
+
+shippingWard: shippingFields.shippingWard ?? existingOrder.shippingWard,
+shippingDistrict:
+  shippingFields.shippingDistrict ?? existingOrder.shippingDistrict,
+shippingCity: shippingFields.shippingCity ?? existingOrder.shippingCity,
+shippingProvince:
+  shippingFields.shippingProvince ?? existingOrder.shippingProvince,
+shippingCountry:
+  shippingFields.shippingCountry ?? existingOrder.shippingCountry,
+
+shippingPostalCode:
+  shippingFields.shippingPostalCode ?? existingOrder.shippingPostalCode,
+        },
+        include: {
+          items: true,
+          payment: true,
+        },
+      });
+
+      if (body.payment && order.payment) {
+        await tx.payment.update({
+          where: { orderId: id },
+          data: {
+            method: normalizeEnum(
+              body.payment.method,
+              PaymentMethod,
+              order.payment.method
+            ),
+            status: normalizeEnum(
+              body.payment.status,
+              PaymentStatus,
+              order.payment.status
+            ),
+            transactionId:
+              body.payment.transactionId !== undefined
+                ? body.payment.transactionId
+                : order.payment.transactionId,
+            amount:
+              body.payment.amount !== undefined
+                ? toDecimalString(body.payment.amount, "0")
+                : order.payment.amount,
+            paidAt:
+              body.payment.paidAt !== undefined
+                ? body.payment.paidAt
+                  ? new Date(body.payment.paidAt)
+                  : null
+                : order.payment.paidAt,
+          },
+        });
+      }
+
+      return order;
     });
 
-    // Create notification for status update if status changed
-    if (existingOrder.status !== validatedData.status) {
+    if (existingOrder.status !== updatedOrder.status) {
       try {
-        const user = await prisma.user.findUnique({
-          where: { email: validatedData.email }
-        });
-        
-        if (user) {
-          await createOrderUpdateNotification(
-            user.id,
-            validatedData.status,
-            updatedOrder.id,
-            validatedData.total
-          );
-          console.log(`📧 Status update notification sent to user: ${user.email} - Status: ${validatedData.status}`);
-        }
+        await createOrderUpdateNotification(
+          updatedOrder.userId,
+          updatedOrder.status,
+          updatedOrder.id,
+          updatedOrder.total
+        );
       } catch (notificationError) {
-        console.error('❌ Failed to create status update notification:', notificationError);
+        console.error("Failed to create status update notification:", notificationError);
       }
     }
-
-    console.log(`Order updated successfully: ID ${updatedOrder.id}`);
 
     return response.status(200).json(updatedOrder);
   } catch (error) {
     console.error("Error updating order:", error);
-    
-    if (error.code === 'P2025') {
-      return response.status(404).json({ 
-        error: "Order not found",
-        details: "The specified order does not exist"
-      });
-    }
-
-    if (error instanceof ValidationError) {
-      return response.status(400).json({
-        error: "Validation failed",
-        details: [{ field: error.field, message: error.message }]
-      });
-    }
-
-    return response.status(500).json({ 
+    return response.status(500).json({
       error: "Internal server error",
-      details: "Failed to update order. Please try again later."
+      details: "Failed to update order",
     });
   }
 }
@@ -285,46 +465,57 @@ async function updateCustomerOrder(request, response) {
 async function deleteCustomerOrder(request, response) {
   try {
     const { id } = request.params;
-    
-    if (!id || typeof id !== 'string') {
+
+    if (!id) {
       return response.status(400).json({
         error: "Invalid order ID",
-        details: "Order ID must be provided"
+        details: "Order ID must be provided",
       });
     }
 
-    const existingOrder = await prisma.customer_order.findUnique({
-      where: { id: id },
+    const existingOrder = await prisma.order.findUnique({
+      where: { id },
+      include: { items: true, payment: true },
     });
 
     if (!existingOrder) {
-      return response.status(404).json({ 
+      return response.status(404).json({
         error: "Order not found",
-        details: "The specified order does not exist"
+        details: "The specified order does not exist",
       });
     }
 
-    await prisma.customer_order.delete({
-      where: {
-        id: id,
-      },
+    await prisma.$transaction(async (tx) => {
+      for (const item of existingOrder.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: {
+              increment: item.quantity,
+            },
+          },
+        });
+      }
+
+      await tx.payment.deleteMany({
+        where: { orderId: id },
+      });
+
+      await tx.orderItem.deleteMany({
+        where: { orderId: id },
+      });
+
+      await tx.order.delete({
+        where: { id },
+      });
     });
 
-    console.log(`Order deleted successfully: ID ${id}`);
     return response.status(204).send();
   } catch (error) {
     console.error("Error deleting order:", error);
-    
-    if (error.code === 'P2025') {
-      return response.status(404).json({ 
-        error: "Order not found",
-        details: "The specified order does not exist"
-      });
-    }
-
-    return response.status(500).json({ 
+    return response.status(500).json({
       error: "Internal server error",
-      details: "Failed to delete order. Please try again later."
+      details: "Failed to delete order",
     });
   }
 }
@@ -332,61 +523,89 @@ async function deleteCustomerOrder(request, response) {
 async function getCustomerOrder(request, response) {
   try {
     const { id } = request.params;
-    
-    if (!id || typeof id !== 'string') {
+
+    if (!id) {
       return response.status(400).json({
         error: "Invalid order ID",
-        details: "Order ID must be provided"
+        details: "Order ID must be provided",
       });
     }
 
-    const order = await prisma.customer_order.findUnique({
-      where: {
-        id: id,
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            phone: true,
+          },
+        },
+        shippingAddress: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        payment: true,
       },
     });
-    
+
     if (!order) {
-      return response.status(404).json({ 
+      return response.status(404).json({
         error: "Order not found",
-        details: "The specified order does not exist"
+        details: "The specified order does not exist",
       });
     }
-    
+
     return response.status(200).json(order);
   } catch (error) {
     console.error("Error fetching order:", error);
-    return response.status(500).json({ 
+    return response.status(500).json({
       error: "Internal server error",
-      details: "Failed to fetch order. Please try again later."
+      details: "Failed to fetch order",
     });
   }
 }
 
 async function getAllOrders(request, response) {
   try {
-    // Add pagination and filtering for better performance
-    const page = parseInt(request.query.page) || 1;
-    const limit = parseInt(request.query.limit) || 50;
-    const offset = (page - 1) * limit;
-    
-    // Validate pagination parameters
-    if (page < 1 || limit < 1 || limit > 100) {
-      return response.status(400).json({
-        error: "Invalid pagination parameters",
-        details: "Page must be >= 1, limit must be between 1 and 100"
-      });
+    const page = Number(request.query.page) || 1;
+    const limit = Number(request.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const where = {};
+
+    if (request.query.userId) {
+      where.userId = request.query.userId;
+    }
+
+    if (request.query.status) {
+      where.status = request.query.status;
     }
 
     const [orders, totalCount] = await Promise.all([
-      prisma.customer_order.findMany({
-        skip: offset,
+      prisma.order.findMany({
+        where,
+        skip,
         take: limit,
+        include: {
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+            },
+          },
+          items: true,
+          payment: true,
+        },
         orderBy: {
-          dateTime: 'desc'
-        }
+          createdAt: "desc",
+        },
       }),
-      prisma.customer_order.count()
+      prisma.order.count({ where }),
     ]);
 
     return response.json({
@@ -395,14 +614,14 @@ async function getAllOrders(request, response) {
         page,
         limit,
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limit)
-      }
+        totalPages: Math.ceil(totalCount / limit),
+      },
     });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return response.status(500).json({ 
+    return response.status(500).json({
       error: "Internal server error",
-      details: "Failed to fetch orders. Please try again later."
+      details: "Failed to fetch orders",
     });
   }
 }

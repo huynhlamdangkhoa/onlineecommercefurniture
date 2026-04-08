@@ -14,6 +14,7 @@ const userRouter = require("./routes/users");
 const orderRouter = require("./routes/customer_orders");
 const slugRouter = require("./routes/slugs");
 const orderProductRouter = require('./routes/customer_order_product');
+const paymentRoutes = require("./routes/payment");
 // const wishlistRouter = require('./routes/wishlist');
 const notificationsRouter = require('./routes/notifications');
 const merchantRouter = require('./routes/merchant'); // Add this line
@@ -131,7 +132,7 @@ app.use("/api/slugs", slugRouter);
 app.use("/api/notifications", notificationsRouter);
 app.use("/api/merchants", merchantRouter); 
 app.use("/api/bulk-upload", bulkUploadRouter);
-
+app.use("/api/payments", paymentRoutes);
 // Health check endpoint (no rate limiting)
 app.get('/health', (req, res) => {
   res.status(200).json({ 

@@ -33,7 +33,7 @@ interface NotificationCardProps {
 const getTypeIcon = (type: NotificationType) => {
   switch (type) {
     case NotificationType.ORDER_UPDATE:
-      return <FaShoppingCart className="text-blue-500" />;
+      return <FaShoppingCart className="text-[#00d08e]" />;
     case NotificationType.PAYMENT_STATUS:
       return <FaCreditCard className="text-green-500" />;
     case NotificationType.PROMOTION:
@@ -48,7 +48,7 @@ const getTypeIcon = (type: NotificationType) => {
 const getTypeColor = (type: NotificationType) => {
   switch (type) {
     case NotificationType.ORDER_UPDATE:
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-blue-100 text-[#05ffb0]';
     case NotificationType.PAYMENT_STATUS:
       return 'bg-green-100 text-green-800';
     case NotificationType.PROMOTION:

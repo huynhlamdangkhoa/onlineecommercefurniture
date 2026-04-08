@@ -28,25 +28,25 @@ export const POST = async (request: Request) => {
 
     const { email, password } = validationResult.data;
 
-    const existingUser = await prisma.user.findFirst({ 
-      where: { email } 
-    });
+const existingUser = await prisma.user.findFirst({ 
+  where: { email } 
+});
 
-    if (existingUser) {
-      throw new AppError("Email is already in use", 400);
-    }
+if (existingUser) {
+  throw new AppError("Email is already in use", 400);
+}
 
-    const hashedPassword = await bcrypt.hash(password, 14);
+const hashedPassword = await bcrypt.hash(password, 14);
 
-    // Create user with proper error handling
-    const newUser = await prisma.user.create({
-      data: {
-        id: nanoid(),
-        email,
-        password: hashedPassword,
-        role: "user",
-      },
-    });
+const newUser = await prisma.user.create({
+  data: {
+    id: nanoid(),
+    fullName: email.split("@")[0],
+    email,
+    password: hashedPassword,
+    role: "CUSTOMER",
+  },
+});
 
     // Return success response without sensitive data
     return new NextResponse(

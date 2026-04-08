@@ -1,3 +1,4 @@
+
 // *********************
 // Role of the component: Display bulk upload batch history
 // Name of the component: BulkUploadHistory.tsx
@@ -141,7 +142,7 @@ const BulkUploadHistory = () => {
       case "PARTIAL":
         return <FaExclamationTriangle className="text-yellow-500 text-xl" />;
       case "PENDING":
-        return <FaClock className="text-blue-500 text-xl" />;
+        return <FaClock className="text-[#00d08e] text-xl" />;
       default:
         return <FaFileAlt className="text-gray-500 text-xl" />;
     }
@@ -161,7 +162,7 @@ const BulkUploadHistory = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00d08e]"></div>
       </div>
     );
   }
@@ -307,7 +308,7 @@ const BulkUploadHistory = () => {
               <p className="text-xs text-gray-500">Failed</p>
             </div>
             <div className="bg-blue-50 rounded p-3 text-center">
-              <p className="text-2xl font-bold text-blue-600">
+              <p className="text-2xl font-bold text-[#00d08e]">
                 {batch.totalRecords > 0
                   ? Math.round(
                       (batch.successfulRecords / batch.totalRecords) * 100

@@ -1,84 +1,81 @@
 export const categoryMenuList = [
   {
     id: 1,
-    title: "Smart Phones",
-    src: "/smart phone icon.png",
-    href: "/shop/smart-phones"
+    title: "Living Room",
+    src: "/icons/living-room.png",
+    href: "/shop/living-room"
   },
   {
     id: 2,
-    title: "Tablets",
-    src: "/tablet icon.png",
-    href: "/shop/tablets"
+    title: "Bedroom",
+    src: "/icons/bedroom.png",
+    href: "/shop/bedroom"
   },
   {
     id: 3,
-    title: "Mouses",
-    src: "/mouse icon.png",
-    href: "/shop/mouses"
+    title: "Dining Room",
+    src: "/icons/dining-room.png",
+    href: "/shop/dining-room"
   },
   {
     id: 4,
-    title: "Cameras",
-    src: "/camera icon.png",
-    href: "/shop/cameras"
+    title: "Office",
+    src: "/icons/office.png",
+    href: "/shop/office"
   },
   {
     id: 5,
-    title: "Smart Watches",
-    src: "/smart watch.png",
-    href: "/shop/watches"
+    title: "Storage",
+    src: "/icons/storage.png",
+    href: "/shop/storage"
   },
   {
     id: 6,
-    title: "Laptops",
-    src: "/laptop icon.png",
-    href: "/shop/laptops"
+    title: "Outdoor",
+    src: "/icons/outdoor.png",
+    href: "/shop/outdoor"
   },
   {
     id: 7,
-    title: "PCs",
-    src: "/pc icon.png",
-    href: "/shop/computers"
+    title: "Sofas",
+    src: "/icons/sofa.png",
+    href: "/shop/sofas"
   },
   {
     id: 8,
-    title: "Printers",
-    src: "/printers icon.png",
-    href: "/shop/printers"
+    title: "Tables",
+    src: "/icons/table.png",
+    href: "/shop/tables"
   },
   {
     id: 9,
-    title: "Earbuds",
-    src: "/ear buds icon.png",
-    href: "/shop/earbuds"
+    title: "Chairs",
+    src: "/icons/chair.png",
+    href: "/shop/chairs"
   },
   {
     id: 10,
-    title: "Head Phones",
-    src: "/headphone icon.png",
-    href: "/shop/headphones"
+    title: "Wardrobes",
+    src: "/icons/wardrobe.png",
+    href: "/shop/wardrobes"
   },
 ];
 
 export const incentives = [
   {
-    name: "Free Shipping",
-    description:
-      "Our shipping is completely free and that is completely good for our customers.",
-    imageSrc: "/shipping icon.png",
+    name: "Free Delivery",
+    description: "We offer fast and reliable delivery for all furniture orders.",
+    imageSrc: "/icons/delivery.png",
   },
   {
-    name: "24/7 Customer Support",
-    description:
-      "Our support is working all day and night to answer any question you have.",
-    imageSrc: "/support icon.png",
+    name: "Quality Assurance",
+    description: "All furniture is inspected to ensure good condition and durability.",
+    imageSrc: "/icons/quality.png",
   },
   {
-    name: "Fast Shopping Cart",
-    description:
-      "We have super fast shopping experience and you will enjoy it.",
-    imageSrc: "/fast shopping icon.png",
+    name: "Affordable Prices",
+    description: "Get high-quality used furniture at the best prices.",
+    imageSrc: "/icons/price.png",
   },
 ];
 
@@ -102,7 +99,7 @@ export const navigation = {
   ],
   help: [
     { name: "Contact", href: "#" },
-    { name: "How to Buy at Singitronic", href: "#" },
+    { name: "How to Buy at Furnimark", href: "#" },
     { name: "FAQ", href: "#" },
   ],
 };
