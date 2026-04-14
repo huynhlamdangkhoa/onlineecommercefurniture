@@ -5,30 +5,42 @@ import Link from "next/link";
 import apiClient from "@/lib/api";
 import { toast } from "react-hot-toast";
 
-interface Merchant {
+interface MerchantItem {
   id: string;
   name: string;
   email: string | null;
-  phone: string | null;
-  address: string | null;
-  description: string | null;
   status: string;
-  products: any[];
+  productCount: number;
 }
 
 export default function MerchantPage() {
-  const [merchants, setMerchants] = useState<Merchant[]>([]);
+  const [merchants, setMerchants] = useState<MerchantItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchMerchants = async () => {
     try {
       setLoading(true);
       const response = await apiClient.get("/api/merchants");
+
       if (!response.ok) {
         throw new Error("Failed to fetch merchants");
       }
+
       const data = await response.json();
-      setMerchants(data);
+
+      const normalizedData: MerchantItem[] = Array.isArray(data)
+        ? data.map((item: any) => ({
+            id: item.id,
+            name: item.name || item.fullName || "N/A",
+            email: item.email || "N/A",
+            status: item.status || "ACTIVE",
+            productCount: Array.isArray(item.products)
+              ? item.products.length
+              : item._count?.products ?? item.productCount ?? 0,
+          }))
+        : [];
+
+      setMerchants(normalizedData);
     } catch (error) {
       console.error("Error fetching merchants:", error);
       toast.error("Failed to load merchants");
@@ -85,7 +97,7 @@ export default function MerchantPage() {
                         {merchant.status}
                       </span>
                     </td>
-                    <td className="py-4">{merchant.products.length}</td>
+                    <td className="py-4">{merchant.productCount}</td>
                     <td className="py-4">
                       <Link
                         href={`/admin/merchant/${merchant.id}`}

@@ -14,22 +14,15 @@ const LoginPage = () => {
   const { data: session, status: sessionStatus } = useSession();
 
   useEffect(() => {
-    // Check if session expired
-    const expired = searchParams.get('expired');
-    if (expired === 'true') {
+    const expired = searchParams.get("expired");
+    if (expired === "true") {
       setError("Your session has expired. Please log in again.");
       toast.error("Your session has expired. Please log in again.");
     }
 
-    // ✅ Redirect theo role thay vì luôn về "/"
-    if (sessionStatus === "authenticated" && session) {
-      const role = (session?.user as any)?.role;
-      if (role === "admin") {
-        router.replace("/admin");
-      } else {
-        router.replace("/");
-      }
-    }
+   if (sessionStatus === "authenticated" && session) {
+  router.replace("/");
+}
   }, [sessionStatus, session, router, searchParams]);
 
   const handleSubmit = async (e: any) => {
@@ -43,7 +36,6 @@ const LoginPage = () => {
       return;
     }
 
-    // ✅ Giảm min length xuống 6 để dùng được password "123456"
     if (!password || password.length < 6) {
       setError("Password is invalid");
       toast.error("Password is invalid");
@@ -62,7 +54,6 @@ const LoginPage = () => {
     } else {
       setError("");
       toast.success("Successful login");
-      // Redirect được xử lý bởi useEffect khi session cập nhật
     }
   };
 
@@ -168,6 +159,7 @@ const LoginPage = () => {
 
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <button
+                  type="button"
                   className="flex w-full items-center border border-gray-300 justify-center gap-3 rounded-md bg-white px-3 py-1.5 text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   onClick={() => signIn("google")}
                 >
@@ -176,6 +168,7 @@ const LoginPage = () => {
                 </button>
 
                 <button
+                  type="button"
                   className="flex w-full items-center justify-center gap-3 rounded-md bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
                   onClick={() => signIn("github")}
                 >

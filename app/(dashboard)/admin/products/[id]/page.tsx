@@ -82,26 +82,29 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
   };
 
   // functionality for uploading main image file
-  const uploadFile = async (file: any) => {
+  const uploadFile = async (file: File) => {
+  try {
     const formData = new FormData();
-    formData.append("uploadedFile", file);
+    formData.append("file", file);
 
-    try {
-      const response = await apiClient.post("/api/main-image", {
-        method: "POST",
-        body: formData,
-      });
+    const response = await fetch("http://localhost:3001/api/bulk-upload", {
+      method: "POST",
+      body: formData,
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-      } else {
-        toast.error("File upload unsuccessful.");
-      }
-    } catch (error) {
-      console.error("There was an error while during request sending:", error);
-      toast.error("There was an error during request sending");
+    const raw = await response.text();
+    console.log("upload status:", response.status);
+    console.log("upload response:", raw);
+
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.status} - ${raw}`);
     }
-  };
+
+    console.log("File upload successful");
+  } catch (error) {
+    console.error("Error happened while sending request:", error);
+  }
+};
 
   // fetching main product data including other product images
   const fetchProductData = async () => {

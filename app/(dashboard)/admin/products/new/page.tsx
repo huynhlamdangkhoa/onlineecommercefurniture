@@ -92,25 +92,32 @@ const AddNewProduct = () => {
     }
   };
 
-  const uploadFile = async (file: any) => {
-    const formData = new FormData();
-    formData.append("uploadedFile", file);
+  const uploadFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append("uploadedFile", file);
 
-    try {
-      const response = await apiClient.post("/api/main-image", {
-        method: "POST",
-        body: formData,
-      });
+  try {
+    const response = await fetch("http://localhost:3001/api/main-image", {
+      method: "POST",
+      body: formData,
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-      } else {
-        console.error("File upload unsuccessfull");
-      }
-    } catch (error) {
-      console.error("Error happend while sending request:", error);
+    const raw = await response.text();
+    console.log("upload status:", response.status);
+    console.log("upload response:", raw);
+
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.status} - ${raw}`);
     }
-  };
+
+    toast.success("Image uploaded successfully");
+    return true;
+  } catch (error) {
+    console.error("Error happened while sending request:", error);
+    toast.error("File upload unsuccessful");
+    return false;
+  }
+};
 
   const fetchCategories = async () => {
     apiClient
@@ -278,15 +285,23 @@ const AddNewProduct = () => {
           <input
             type="file"
             className="file-input file-input-bordered file-input-lg w-full max-w-sm"
-            onChange={(e: any) => {
-              uploadFile(e.target.files[0]);
-              setProduct({ ...product, mainImage: e.target.files[0].name });
-            }}
+          onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const ok = await uploadFile(file);
+  if (!ok) return;
+
+  setProduct((prev) => ({
+    ...prev,
+    mainImage: file.name,
+  }));
+}}
           />
           {product?.mainImage && (
             <Image
               src={`/` + product?.mainImage}
-              alt={product?.title}
+              alt={product?.title || "Product image"}
               className="w-auto h-auto"
               width={100}
               height={100}
