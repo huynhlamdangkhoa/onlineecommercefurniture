@@ -1,13 +1,3 @@
-// *********************
-// Role of the component: Footer component
-// Name of the component: Footer.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <Footer />
-// Input parameters: no input parameters
-// Output: Footer component
-// *********************
-
 import { navigation } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
